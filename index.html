@@ -12,7 +12,7 @@
         body {
             margin: 0;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #eef2f7;
+            background-color: #f4f7fb;
             display: flex;
             justify-content: center;
             padding: 40px 20px;
@@ -24,17 +24,13 @@
             background: #ffffff;
             padding: 30px;
             border-radius: 12px;
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
         }
 
         h1 {
             text-align: center;
-            margin-bottom: 30px;
+            margin-bottom: 25px;
             color: #2c3e50;
-        }
-
-        canvas {
-            margin-bottom: 30px;
         }
 
         .form-group {
@@ -62,14 +58,12 @@
         }
 
         button {
-            width: 100%;
-            padding: 12px;
-            margin-top: 10px;
+            padding: 10px 15px;
             background-color: #3498db;
             color: white;
             border: none;
             border-radius: 8px;
-            font-size: 15px;
+            font-size: 14px;
             font-weight: 600;
             cursor: pointer;
             transition: background 0.3s ease;
@@ -79,8 +73,23 @@
             background-color: #2980b9;
         }
 
+        .add-btn {
+            width: 100%;
+            margin-top: 10px;
+            padding: 12px;
+        }
+
+        .chart-toggle {
+            margin: 20px 0 10px 0;
+            text-align: right;
+        }
+
+        .chart-container {
+            margin: 10px 0 30px 0;
+        }
+
         .inventory-list {
-            margin-top: 30px;
+            margin-top: 20px;
         }
 
         .inventory-item {
@@ -91,6 +100,15 @@
             background-color: #f8fafc;
             margin-bottom: 10px;
             border: 1px solid #eef1f5;
+        }
+
+        .item-name {
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .item-quantity {
+            color: #555;
         }
 
         .empty-message {
@@ -104,10 +122,6 @@
 <div class="container">
     <h1>ABC Logistics Inventory Management</h1>
 
-    <!-- Chart -->
-    <canvas id="inventoryChart"></canvas>
-
-    <!-- Form -->
     <div class="form-group">
         <label for="itemName">Item Name</label>
         <input type="text" id="itemName" placeholder="Enter item name">
@@ -118,15 +132,26 @@
         <input type="number" id="quantity" placeholder="Enter quantity">
     </div>
 
-    <button onclick="addItem()">Add</button>
+    <button class="add-btn" onclick="addItem()">Add</button>
 
-    <!-- List -->
+    <!-- Toggle Button -->
+    <div class="chart-toggle">
+        <button id="toggleChartBtn" onclick="toggleChart()">Switch to Pie Chart</button>
+    </div>
+
+    <!-- Chart -->
+    <div class="chart-container">
+        <canvas id="inventoryChart"></canvas>
+    </div>
+
+    <!-- Inventory List -->
     <div class="inventory-list" id="inventoryList"></div>
 </div>
 
 <script>
     const inventoryKey = "abc_inventory_data";
     let inventoryChart;
+    let currentChartType = 'bar';
 
     function getInventory() {
         const data = localStorage.getItem(inventoryKey);
@@ -140,71 +165,32 @@
     function renderInventory() {
         const inventoryList = document.getElementById("inventoryList");
         inventoryList.innerHTML = "";
+
         const items = getInventory();
 
         if (items.length === 0) {
             inventoryList.innerHTML = '<div class="empty-message">No inventory items added yet.</div>';
-            return;
-        }
-
-        items.forEach(item => {
-            const itemDiv = document.createElement("div");
-            itemDiv.className = "inventory-item";
-            itemDiv.innerHTML = `
-                <span><strong>${item.name}</strong></span>
-                <span>Qty: ${item.quantity}</span>
-            `;
-            inventoryList.appendChild(itemDiv);
-        });
-    }
-
-    function updateChart() {
-        const items = getInventory();
-        const labels = items.map(item => item.name);
-        const quantities = items.map(item => item.quantity);
-
-        if (inventoryChart) {
-            inventoryChart.data.labels = labels;
-            inventoryChart.data.datasets[0].data = quantities;
-            inventoryChart.update();
         } else {
-            const ctx = document.getElementById("inventoryChart").getContext("2d");
-            inventoryChart = new Chart(ctx, {
-                type: "bar",
-                data: {
-                    labels: labels,
-                    datasets: [{
-                        label: "Inventory Quantity",
-                        data: quantities,
-                        backgroundColor: "rgba(52, 152, 219, 0.6)",
-                        borderRadius: 6
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    plugins: {
-                        legend: { display: false }
-                    },
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            ticks: { precision: 0 }
-                        }
-                    }
-                }
+            items.forEach(item => {
+                const itemDiv = document.createElement("div");
+                itemDiv.className = "inventory-item";
+                itemDiv.innerHTML = `
+                    <span class="item-name">${item.name}</span>
+                    <span class="item-quantity">Qty: ${item.quantity}</span>
+                `;
+                inventoryList.appendChild(itemDiv);
             });
         }
+
+        updateChart(items);
     }
 
     function addItem() {
-        const nameInput = document.getElementById("itemName");
-        const quantityInput = document.getElementById("quantity");
-
-        const name = nameInput.value.trim();
-        const quantity = parseInt(quantityInput.value);
+        const name = document.getElementById("itemName").value.trim();
+        const quantity = parseInt(document.getElementById("quantity").value);
 
         if (!name || isNaN(quantity) || quantity < 0) {
-            alert("Please enter valid item name and quantity.");
+            alert("Please enter a valid item name and quantity.");
             return;
         }
 
@@ -213,15 +199,73 @@
 
         saveInventory(items);
         renderInventory();
-        updateChart();
 
-        nameInput.value = "";
-        quantityInput.value = "";
+        document.getElementById("itemName").value = "";
+        document.getElementById("quantity").value = "";
+    }
+
+    function initChart() {
+        const ctx = document.getElementById("inventoryChart").getContext("2d");
+
+        inventoryChart = new Chart(ctx, {
+            type: currentChartType,
+            data: {
+                labels: [],
+                datasets: [{
+                    label: 'Inventory Quantity',
+                    data: [],
+                    backgroundColor: generateColors(20)
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        display: currentChartType === 'pie'
+                    }
+                },
+                scales: currentChartType === 'bar' ? {
+                    y: { beginAtZero: true }
+                } : {}
+            }
+        });
+    }
+
+    function updateChart(items) {
+        const labels = items.map(item => item.name);
+        const data = items.map(item => item.quantity);
+
+        inventoryChart.data.labels = labels;
+        inventoryChart.data.datasets[0].data = data;
+        inventoryChart.data.datasets[0].backgroundColor = generateColors(labels.length);
+
+        inventoryChart.update();
+    }
+
+    function toggleChart() {
+        currentChartType = currentChartType === 'bar' ? 'pie' : 'bar';
+
+        document.getElementById("toggleChartBtn").innerText =
+            currentChartType === 'bar'
+                ? "Switch to Pie Chart"
+                : "Switch to Bar Chart";
+
+        inventoryChart.destroy();
+        initChart();
+        updateChart(getInventory());
+    }
+
+    function generateColors(count) {
+        const colors = [];
+        for (let i = 0; i < count; i++) {
+            colors.push(`hsl(${i * 50 % 360}, 70%, 60%)`);
+        }
+        return colors;
     }
 
     window.onload = function () {
+        initChart();
         renderInventory();
-        updateChart();
     };
 </script>
 
