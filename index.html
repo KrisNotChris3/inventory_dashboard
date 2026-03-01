@@ -102,20 +102,6 @@
             border: 1px solid #eef1f5;
         }
 
-        .item-name {
-            font-weight: 600;
-            color: #2c3e50;
-        }
-
-        .item-quantity {
-            color: #555;
-        }
-
-        .empty-message {
-            text-align: center;
-            color: #888;
-        }
-
         .clear-btn {
             width: 100%;
             margin-top: 15px;
@@ -124,6 +110,11 @@
 
         .clear-btn:hover {
             background-color: #c0392b;
+        }
+
+        .empty-message {
+            text-align: center;
+            color: #888;
         }
     </style>
 </head>
@@ -139,25 +130,26 @@
 
     <div class="form-group">
         <label for="quantity">Quantity</label>
-        <input type="number" id="quantity" placeholder="Enter quantity">
+        <input type="number" id="quantity" placeholder="Enter quantity" min="1" step="1">
+    </div>
+
+    <div class="form-group">
+        <label for="price">Price (Optional)</label>
+        <input type="number" id="price" placeholder="Enter price" step="0.01" min="0">
     </div>
 
     <button class="add-btn" onclick="addItem()">Add</button>
 
-    <!-- Toggle Button -->
     <div class="chart-toggle">
         <button id="toggleChartBtn" onclick="toggleChart()">Switch to Pie Chart</button>
     </div>
 
-    <!-- Chart -->
     <div class="chart-container">
         <canvas id="inventoryChart"></canvas>
     </div>
 
-    <!-- Inventory List -->
     <div class="inventory-list" id="inventoryList"></div>
 
-    <!-- Clear All Button -->
     <button class="clear-btn" onclick="clearAllItems()">Clear All Items</button>
 </div>
 
@@ -188,8 +180,7 @@
                 const itemDiv = document.createElement("div");
                 itemDiv.className = "inventory-item";
                 itemDiv.innerHTML = `
-                    <span class="item-name">${item.name}</span>
-                    <span class="item-quantity">Qty: ${item.quantity}</span>
+                    <span><strong>${item.name}</strong> - Qty: ${item.quantity}${item.price ? " | $" + item.price.toFixed(2) : ""}</span>
                 `;
                 inventoryList.appendChild(itemDiv);
             });
@@ -198,23 +189,57 @@
         updateChart(items);
     }
 
+    function validateInput(name, quantity, price) {
+        const items = getInventory();
+
+        if (!name) {
+            alert("Item name cannot be empty.");
+            return false;
+        }
+
+        const duplicate = items.some(item => item.name.toLowerCase() === name.toLowerCase());
+        if (duplicate) {
+            alert("Item name already exists (case-insensitive).");
+            return false;
+        }
+
+        if (!Number.isInteger(quantity) || quantity <= 0) {
+            alert("Quantity must be a positive integer.");
+            return false;
+        }
+
+        if (price !== "" && !/^\d+(\.\d{1,2})?$/.test(price)) {
+            alert("Price must be a positive number with up to two decimal places.");
+            return false;
+        }
+
+        return true;
+    }
+
     function addItem() {
         const name = document.getElementById("itemName").value.trim();
-        const quantity = parseInt(document.getElementById("quantity").value);
+        const quantityValue = document.getElementById("quantity").value;
+        const priceValue = document.getElementById("price").value.trim();
 
-        if (!name || isNaN(quantity) || quantity < 0) {
-            alert("Please enter a valid item name and quantity.");
+        const quantity = Number(quantityValue);
+
+        if (!validateInput(name, quantity, priceValue)) {
             return;
         }
 
         const items = getInventory();
-        items.push({ name, quantity });
+        items.push({
+            name,
+            quantity,
+            price: priceValue ? parseFloat(priceValue) : null
+        });
 
         saveInventory(items);
         renderInventory();
 
         document.getElementById("itemName").value = "";
         document.getElementById("quantity").value = "";
+        document.getElementById("price").value = "";
     }
 
     function clearAllItems() {
@@ -232,7 +257,7 @@
                 datasets: [{
                     label: 'Inventory Quantity',
                     data: [],
-                    backgroundColor: generateColors(20)
+                    backgroundColor: []
                 }]
             },
             options: {
@@ -256,13 +281,11 @@
         inventoryChart.data.labels = labels;
         inventoryChart.data.datasets[0].data = data;
         inventoryChart.data.datasets[0].backgroundColor = generateColors(labels.length);
-
         inventoryChart.update();
     }
 
     function toggleChart() {
         currentChartType = currentChartType === 'bar' ? 'pie' : 'bar';
-
         document.getElementById("toggleChartBtn").innerText =
             currentChartType === 'bar'
                 ? "Switch to Pie Chart"
