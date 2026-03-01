@@ -1,0 +1,144 @@
+/* ===== Global Styles ===== */
+body {
+    margin: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f4f7fb;
+}
+
+/* ===== Navigation Bar ===== */
+.navbar {
+    background-color: #2c3e50;
+    padding: 15px 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.navbar-title {
+    color: white;
+    font-weight: 600;
+    font-size: 18px;
+}
+
+.nav-links a {
+    color: white;
+    text-decoration: none;
+    margin-left: 20px;
+    font-weight: 500;
+    transition: opacity 0.3s ease;
+}
+
+.nav-links a:hover {
+    opacity: 0.7;
+}
+
+/* ===== Main Container ===== */
+.container {
+    max-width: 900px;
+    margin: 40px auto;
+    background: white;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+}
+
+h1 {
+    margin-top: 0;
+    color: #2c3e50;
+}
+
+/* ===== Form Styling ===== */
+.form-group {
+    margin-bottom: 15px;
+}
+
+label {
+    display: block;
+    margin-bottom: 6px;
+    font-weight: 600;
+    color: #34495e;
+}
+
+input {
+    width: 100%;
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid #dcdde1;
+    font-size: 14px;
+}
+
+input:focus {
+    outline: none;
+    border-color: #3498db;
+}
+
+/* ===== Buttons ===== */
+button {
+    padding: 10px 15px;
+    background-color: #3498db;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.3s ease;
+}
+
+button:hover {
+    background-color: #2980b9;
+}
+
+.add-btn {
+    width: 100%;
+    margin-top: 10px;
+    padding: 12px;
+}
+
+.clear-btn {
+    width: 100%;
+    margin-top: 15px;
+    background-color: #e74c3c;
+}
+
+.clear-btn:hover {
+    background-color: #c0392b;
+}
+
+/* ===== Inventory List ===== */
+.inventory-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 12px;
+    border-radius: 8px;
+    background-color: #f8fafc;
+    margin-bottom: 10px;
+    border: 1px solid #eef1f5;
+}
+
+.empty-message {
+    text-align: center;
+    color: #888;
+}
+
+/* ===== About Page ===== */
+.profile-section {
+    margin-bottom: 20px;
+}
+
+.profile-label {
+    font-weight: 600;
+    color: #34495e;
+}
+
+.profile-content {
+    margin-top: 5px;
+    color: #555;
+}
+
+.footer {
+    text-align: center;
+    margin-top: 40px;
+    color: #888;
+    font-size: 14px;
+}
