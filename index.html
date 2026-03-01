@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>ABC Logistics Inventory Management</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f7fb;
+            display: flex;
+            justify-content: center;
+            padding: 40px 20px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 600px;
+            background: #ffffff;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 25px;
+            color: #2c3e50;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 600;
+            color: #34495e;
+        }
+
+        input {
+            width: 100%;
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid #dcdde1;
+            font-size: 14px;
+            transition: border 0.3s ease;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #3498db;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            margin-top: 10px;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s ease, transform 0.1s ease;
+        }
+
+        button:hover {
+            background-color: #2980b9;
+        }
+
+        button:active {
+            transform: scale(0.98);
+        }
+
+        .inventory-list {
+            margin-top: 30px;
+        }
+
+        .inventory-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px;
+            border-radius: 8px;
+            background-color: #f8fafc;
+            margin-bottom: 10px;
+            border: 1px solid #eef1f5;
+        }
+
+        .item-name {
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .item-quantity {
+            color: #555;
+        }
+
+        .empty-message {
+            text-align: center;
+            color: #888;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>ABC Logistics Inventory Management</h1>
+
+    <div class="form-group">
+        <label for="itemName">Item Name</label>
+        <input type="text" id="itemName" placeholder="Enter item name">
+    </div>
+
+    <div class="form-group">
+        <label for="quantity">Quantity</label>
+        <input type="number" id="quantity" placeholder="Enter quantity">
+    </div>
+
+    <button onclick="addItem()">Add</button>
+
+    <div class="inventory-list" id="inventoryList">
+        <!-- Items will be displayed here -->
+    </div>
+</div>
+
+<script>
+    const inventoryKey = "abc_inventory_data";
+
+    function getInventory() {
+        const data = localStorage.getItem(inventoryKey);
+        return data ? JSON.parse(data) : [];
+    }
+
+    function saveInventory(items) {
+        localStorage.setItem(inventoryKey, JSON.stringify(items));
+    }
+
+    function renderInventory() {
+        const inventoryList = document.getElementById("inventoryList");
+        inventoryList.innerHTML = "";
+
+        const items = getInventory();
+
+        if (items.length === 0) {
+            inventoryList.innerHTML = '<div class="empty-message">No inventory items added yet.</div>';
+            return;
+        }
+
+        items.forEach((item, index) => {
+            const itemDiv = document.createElement("div");
+            itemDiv.className = "inventory-item";
+
+            itemDiv.innerHTML = `
+                <span class="item-name">${item.name}</span>
+                <span class="item-quantity">Qty: ${item.quantity}</span>
+            `;
+
+            inventoryList.appendChild(itemDiv);
+        });
+    }
+
+    function addItem() {
+        const itemNameInput = document.getElementById("itemName");
+        const quantityInput = document.getElementById("quantity");
+
+        const name = itemNameInput.value.trim();
+        const quantity = parseInt(quantityInput.value);
+
+        if (!name || isNaN(quantity) || quantity < 0) {
+            alert("Please enter a valid item name and quantity.");
+            return;
+        }
+
+        const items = getInventory();
+        items.push({ name, quantity });
+
+        saveInventory(items);
+        renderInventory();
+
+        itemNameInput.value = "";
+        quantityInput.value = "";
+    }
+
+    window.onload = function () {
+        renderInventory();
+    };
+</script>
+
+</body>
+</html>
