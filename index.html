@@ -115,6 +115,16 @@
             text-align: center;
             color: #888;
         }
+
+        .clear-btn {
+            width: 100%;
+            margin-top: 15px;
+            background-color: #e74c3c;
+        }
+
+        .clear-btn:hover {
+            background-color: #c0392b;
+        }
     </style>
 </head>
 <body>
@@ -146,6 +156,9 @@
 
     <!-- Inventory List -->
     <div class="inventory-list" id="inventoryList"></div>
+
+    <!-- Clear All Button -->
+    <button class="clear-btn" onclick="clearAllItems()">Clear All Items</button>
 </div>
 
 <script>
@@ -202,6 +215,11 @@
 
         document.getElementById("itemName").value = "";
         document.getElementById("quantity").value = "";
+    }
+
+    function clearAllItems() {
+        localStorage.removeItem(inventoryKey);
+        renderInventory();
     }
 
     function initChart() {
