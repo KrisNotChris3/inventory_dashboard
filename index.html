@@ -5,11 +5,14 @@
     <title>ABC Logistics Inventory Management</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
     <style>
         body {
             margin: 0;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f4f7fb;
+            background-color: #eef2f7;
             display: flex;
             justify-content: center;
             padding: 40px 20px;
@@ -17,17 +20,21 @@
 
         .container {
             width: 100%;
-            max-width: 600px;
+            max-width: 800px;
             background: #ffffff;
             padding: 30px;
             border-radius: 12px;
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
         }
 
         h1 {
             text-align: center;
-            margin-bottom: 25px;
+            margin-bottom: 30px;
             color: #2c3e50;
+        }
+
+        canvas {
+            margin-bottom: 30px;
         }
 
         .form-group {
@@ -47,7 +54,6 @@
             border-radius: 8px;
             border: 1px solid #dcdde1;
             font-size: 14px;
-            transition: border 0.3s ease;
         }
 
         input:focus {
@@ -66,15 +72,11 @@
             font-size: 15px;
             font-weight: 600;
             cursor: pointer;
-            transition: background 0.3s ease, transform 0.1s ease;
+            transition: background 0.3s ease;
         }
 
         button:hover {
             background-color: #2980b9;
-        }
-
-        button:active {
-            transform: scale(0.98);
         }
 
         .inventory-list {
@@ -91,19 +93,9 @@
             border: 1px solid #eef1f5;
         }
 
-        .item-name {
-            font-weight: 600;
-            color: #2c3e50;
-        }
-
-        .item-quantity {
-            color: #555;
-        }
-
         .empty-message {
             text-align: center;
             color: #888;
-            margin-top: 10px;
         }
     </style>
 </head>
@@ -112,6 +104,10 @@
 <div class="container">
     <h1>ABC Logistics Inventory Management</h1>
 
+    <!-- Chart -->
+    <canvas id="inventoryChart"></canvas>
+
+    <!-- Form -->
     <div class="form-group">
         <label for="itemName">Item Name</label>
         <input type="text" id="itemName" placeholder="Enter item name">
@@ -124,13 +120,13 @@
 
     <button onclick="addItem()">Add</button>
 
-    <div class="inventory-list" id="inventoryList">
-        <!-- Items will be displayed here -->
-    </div>
+    <!-- List -->
+    <div class="inventory-list" id="inventoryList"></div>
 </div>
 
 <script>
     const inventoryKey = "abc_inventory_data";
+    let inventoryChart;
 
     function getInventory() {
         const data = localStorage.getItem(inventoryKey);
@@ -144,7 +140,6 @@
     function renderInventory() {
         const inventoryList = document.getElementById("inventoryList");
         inventoryList.innerHTML = "";
-
         const items = getInventory();
 
         if (items.length === 0) {
@@ -152,28 +147,64 @@
             return;
         }
 
-        items.forEach((item, index) => {
+        items.forEach(item => {
             const itemDiv = document.createElement("div");
             itemDiv.className = "inventory-item";
-
             itemDiv.innerHTML = `
-                <span class="item-name">${item.name}</span>
-                <span class="item-quantity">Qty: ${item.quantity}</span>
+                <span><strong>${item.name}</strong></span>
+                <span>Qty: ${item.quantity}</span>
             `;
-
             inventoryList.appendChild(itemDiv);
         });
     }
 
+    function updateChart() {
+        const items = getInventory();
+        const labels = items.map(item => item.name);
+        const quantities = items.map(item => item.quantity);
+
+        if (inventoryChart) {
+            inventoryChart.data.labels = labels;
+            inventoryChart.data.datasets[0].data = quantities;
+            inventoryChart.update();
+        } else {
+            const ctx = document.getElementById("inventoryChart").getContext("2d");
+            inventoryChart = new Chart(ctx, {
+                type: "bar",
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: "Inventory Quantity",
+                        data: quantities,
+                        backgroundColor: "rgba(52, 152, 219, 0.6)",
+                        borderRadius: 6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: { precision: 0 }
+                        }
+                    }
+                }
+            });
+        }
+    }
+
     function addItem() {
-        const itemNameInput = document.getElementById("itemName");
+        const nameInput = document.getElementById("itemName");
         const quantityInput = document.getElementById("quantity");
 
-        const name = itemNameInput.value.trim();
+        const name = nameInput.value.trim();
         const quantity = parseInt(quantityInput.value);
 
         if (!name || isNaN(quantity) || quantity < 0) {
-            alert("Please enter a valid item name and quantity.");
+            alert("Please enter valid item name and quantity.");
             return;
         }
 
@@ -182,13 +213,15 @@
 
         saveInventory(items);
         renderInventory();
+        updateChart();
 
-        itemNameInput.value = "";
+        nameInput.value = "";
         quantityInput.value = "";
     }
 
     window.onload = function () {
         renderInventory();
+        updateChart();
     };
 </script>
 
