@@ -2,8 +2,11 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>About Me - ABC Logistics Inventory Management</title>
+    <title>ABC Logistics Inventory Management</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <style>
         body {
@@ -39,12 +42,12 @@
         }
 
         .container {
-            max-width: 800px;
+            max-width: 900px;
             margin: 40px auto;
-            background: white;
+            background: #ffffff;
             padding: 30px;
             border-radius: 12px;
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.08);
         }
 
         h1 {
@@ -52,31 +55,73 @@
             color: #2c3e50;
         }
 
-        .profile-section {
-            margin-bottom: 20px;
+        .form-group {
+            margin-bottom: 15px;
         }
 
-        .profile-label {
+        label {
             font-weight: 600;
-            color: #34495e;
         }
 
-        .profile-content {
+        input {
+            width: 100%;
+            padding: 10px;
             margin-top: 5px;
-            color: #555;
+            border-radius: 8px;
+            border: 1px solid #dcdde1;
         }
 
-        .footer {
+        button {
+            padding: 10px 15px;
+            border-radius: 8px;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .add-btn {
+            width: 100%;
+            margin-top: 10px;
+            background-color: #3498db;
+            color: white;
+        }
+
+        .toggle-btn {
+            background-color: #3498db;
+            color: white;
+        }
+
+        .clear-btn {
+            width: 100%;
+            margin-top: 20px;
+            background-color: #e74c3c;
+            color: white;
+        }
+
+        .chart-toggle {
+            text-align: right;
+            margin-top: 20px;
+        }
+
+        .chart-container {
+            margin: 20px 0;
+        }
+
+        .inventory-item {
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .empty-message {
             text-align: center;
-            margin-top: 40px;
             color: #888;
-            font-size: 14px;
         }
     </style>
 </head>
+
 <body>
 
-<!-- Navigation Bar -->
+<!-- NAVBAR -->
 <div class="navbar">
     <div class="navbar-title">ABC Logistics</div>
     <div class="nav-links">
@@ -86,49 +131,172 @@
 </div>
 
 <div class="container">
-    <h1>Developer Profile</h1>
+    <h1>Inventory Dashboard</h1>
 
-    <div class="profile-section">
-        <div class="profile-label">Name:</div>
-        <div class="profile-content">[Your Name Here]</div>
+    <div class="form-group">
+        <label>Item Name</label>
+        <input type="text" id="itemName">
     </div>
 
-    <div class="profile-section">
-        <div class="profile-label">Student ID / Employee ID:</div>
-        <div class="profile-content">[Your ID Here]</div>
+    <div class="form-group">
+        <label>Quantity</label>
+        <input type="number" id="quantity">
     </div>
 
-    <div class="profile-section">
-        <div class="profile-label">Program / Role:</div>
-        <div class="profile-content">[Your Program or Position]</div>
+    <div class="form-group">
+        <label>Price (Optional)</label>
+        <input type="number" id="price" step="0.01">
     </div>
 
-    <div class="profile-section">
-        <div class="profile-label">Skills:</div>
-        <div class="profile-content">
-            HTML, CSS, JavaScript, Chart.js, LocalStorage
-        </div>
+    <button class="add-btn" onclick="addItem()">Add Item</button>
+
+    <div class="chart-toggle">
+        <button class="toggle-btn" id="toggleChartBtn" onclick="toggleChart()">
+            Switch to Pie Chart
+        </button>
     </div>
 
-    <div class="profile-section">
-        <div class="profile-label">Project Description:</div>
-        <div class="profile-content">
-            This inventory management dashboard was developed as part of a web development project. 
-            It demonstrates dynamic data storage, chart visualization, and multi-page navigation.
-        </div>
+    <div class="chart-container">
+        <canvas id="inventoryChart"></canvas>
     </div>
 
-    <div class="profile-section">
-        <div class="profile-label">Contact:</div>
-        <div class="profile-content">
-            [Your Email Address]
-        </div>
-    </div>
+    <div id="inventoryList"></div>
 
-    <div class="footer">
-        © 2026 ABC Logistics Inventory Management
-    </div>
+    <button class="clear-btn" onclick="clearAllItems()">Clear All Items</button>
 </div>
+
+<script>
+    const inventoryKey = "abc_inventory_data";
+    let inventoryChart;
+    let currentChartType = "bar";
+
+    function getInventory() {
+        return JSON.parse(localStorage.getItem(inventoryKey)) || [];
+    }
+
+    function saveInventory(items) {
+        localStorage.setItem(inventoryKey, JSON.stringify(items));
+    }
+
+    function validateInput(name, quantity, price) {
+        const items = getInventory();
+
+        if (!name) {
+            alert("Item name cannot be empty.");
+            return false;
+        }
+
+        if (items.some(i => i.name.toLowerCase() === name.toLowerCase())) {
+            alert("Item name already exists.");
+            return false;
+        }
+
+        if (!Number.isInteger(quantity) || quantity <= 0) {
+            alert("Quantity must be a positive integer.");
+            return false;
+        }
+
+        if (price && !/^\d+(\.\d{1,2})?$/.test(price)) {
+            alert("Price must be positive with up to two decimals.");
+            return false;
+        }
+
+        return true;
+    }
+
+    function addItem() {
+        const name = document.getElementById("itemName").value.trim();
+        const quantity = Number(document.getElementById("quantity").value);
+        const price = document.getElementById("price").value.trim();
+
+        if (!validateInput(name, quantity, price)) return;
+
+        const items = getInventory();
+        items.push({
+            name,
+            quantity,
+            price: price ? parseFloat(price) : null
+        });
+
+        saveInventory(items);
+        renderInventory();
+
+        document.getElementById("itemName").value = "";
+        document.getElementById("quantity").value = "";
+        document.getElementById("price").value = "";
+    }
+
+    function renderInventory() {
+        const list = document.getElementById("inventoryList");
+        list.innerHTML = "";
+
+        const items = getInventory();
+
+        if (items.length === 0) {
+            list.innerHTML = "<div class='empty-message'>No items added.</div>";
+        } else {
+            items.forEach(item => {
+                const div = document.createElement("div");
+                div.className = "inventory-item";
+                div.innerHTML = `<strong>${item.name}</strong> - Qty: ${item.quantity}
+                    ${item.price ? " | $" + item.price.toFixed(2) : ""}`;
+                list.appendChild(div);
+            });
+        }
+
+        updateChart(items);
+    }
+
+    function clearAllItems() {
+        localStorage.removeItem(inventoryKey);
+        renderInventory();
+    }
+
+    function initChart() {
+        const ctx = document.getElementById("inventoryChart");
+        inventoryChart = new Chart(ctx, {
+            type: currentChartType,
+            data: {
+                labels: [],
+                datasets: [{
+                    data: [],
+                    backgroundColor: []
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: currentChartType === "bar" ? {
+                    y: { beginAtZero: true }
+                } : {}
+            }
+        });
+    }
+
+    function updateChart(items) {
+        inventoryChart.data.labels = items.map(i => i.name);
+        inventoryChart.data.datasets[0].data = items.map(i => i.quantity);
+        inventoryChart.data.datasets[0].backgroundColor =
+            items.map((_, i) => `hsl(${i * 60 % 360},70%,60%)`);
+        inventoryChart.update();
+    }
+
+    function toggleChart() {
+        currentChartType = currentChartType === "bar" ? "pie" : "bar";
+        document.getElementById("toggleChartBtn").innerText =
+            currentChartType === "bar"
+                ? "Switch to Pie Chart"
+                : "Switch to Bar Chart";
+
+        inventoryChart.destroy();
+        initChart();
+        renderInventory();
+    }
+
+    window.onload = function() {
+        initChart();
+        renderInventory();
+    };
+</script>
 
 </body>
 </html>
