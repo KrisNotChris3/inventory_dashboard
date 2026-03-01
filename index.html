@@ -2,313 +2,133 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>ABC Logistics Inventory Management</title>
+    <title>About Me - ABC Logistics Inventory Management</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <!-- Chart.js CDN -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <style>
         body {
             margin: 0;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background-color: #f4f7fb;
+        }
+
+        /* Navigation Bar */
+        .navbar {
+            background-color: #2c3e50;
+            padding: 15px 30px;
             display: flex;
-            justify-content: center;
-            padding: 40px 20px;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .navbar-title {
+            color: white;
+            font-weight: 600;
+            font-size: 18px;
+        }
+
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            margin-left: 20px;
+            font-weight: 500;
+        }
+
+        .nav-links a:hover {
+            text-decoration: underline;
         }
 
         .container {
-            width: 100%;
             max-width: 800px;
-            background: #ffffff;
+            margin: 40px auto;
+            background: white;
             padding: 30px;
             border-radius: 12px;
             box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
         }
 
         h1 {
-            text-align: center;
-            margin-bottom: 25px;
+            margin-top: 0;
             color: #2c3e50;
         }
 
-        .form-group {
-            margin-bottom: 15px;
+        .profile-section {
+            margin-bottom: 20px;
         }
 
-        label {
-            display: block;
-            margin-bottom: 6px;
+        .profile-label {
             font-weight: 600;
             color: #34495e;
         }
 
-        input {
-            width: 100%;
-            padding: 10px;
-            border-radius: 8px;
-            border: 1px solid #dcdde1;
-            font-size: 14px;
+        .profile-content {
+            margin-top: 5px;
+            color: #555;
         }
 
-        input:focus {
-            outline: none;
-            border-color: #3498db;
-        }
-
-        button {
-            padding: 10px 15px;
-            background-color: #3498db;
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-size: 14px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: background 0.3s ease;
-        }
-
-        button:hover {
-            background-color: #2980b9;
-        }
-
-        .add-btn {
-            width: 100%;
-            margin-top: 10px;
-            padding: 12px;
-        }
-
-        .chart-toggle {
-            margin: 20px 0 10px 0;
-            text-align: right;
-        }
-
-        .chart-container {
-            margin: 10px 0 30px 0;
-        }
-
-        .inventory-list {
-            margin-top: 20px;
-        }
-
-        .inventory-item {
-            display: flex;
-            justify-content: space-between;
-            padding: 12px;
-            border-radius: 8px;
-            background-color: #f8fafc;
-            margin-bottom: 10px;
-            border: 1px solid #eef1f5;
-        }
-
-        .clear-btn {
-            width: 100%;
-            margin-top: 15px;
-            background-color: #e74c3c;
-        }
-
-        .clear-btn:hover {
-            background-color: #c0392b;
-        }
-
-        .empty-message {
+        .footer {
             text-align: center;
+            margin-top: 40px;
             color: #888;
+            font-size: 14px;
         }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <h1>ABC Logistics Inventory Management</h1>
-
-    <div class="form-group">
-        <label for="itemName">Item Name</label>
-        <input type="text" id="itemName" placeholder="Enter item name">
+<!-- Navigation Bar -->
+<div class="navbar">
+    <div class="navbar-title">ABC Logistics</div>
+    <div class="nav-links">
+        <a href="index.html">Dashboard</a>
+        <a href="about.html">About Me</a>
     </div>
-
-    <div class="form-group">
-        <label for="quantity">Quantity</label>
-        <input type="number" id="quantity" placeholder="Enter quantity" min="1" step="1">
-    </div>
-
-    <div class="form-group">
-        <label for="price">Price (Optional)</label>
-        <input type="number" id="price" placeholder="Enter price" step="0.01" min="0">
-    </div>
-
-    <button class="add-btn" onclick="addItem()">Add</button>
-
-    <div class="chart-toggle">
-        <button id="toggleChartBtn" onclick="toggleChart()">Switch to Pie Chart</button>
-    </div>
-
-    <div class="chart-container">
-        <canvas id="inventoryChart"></canvas>
-    </div>
-
-    <div class="inventory-list" id="inventoryList"></div>
-
-    <button class="clear-btn" onclick="clearAllItems()">Clear All Items</button>
 </div>
 
-<script>
-    const inventoryKey = "abc_inventory_data";
-    let inventoryChart;
-    let currentChartType = 'bar';
+<div class="container">
+    <h1>Developer Profile</h1>
 
-    function getInventory() {
-        const data = localStorage.getItem(inventoryKey);
-        return data ? JSON.parse(data) : [];
-    }
+    <div class="profile-section">
+        <div class="profile-label">Name:</div>
+        <div class="profile-content">[Your Name Here]</div>
+    </div>
 
-    function saveInventory(items) {
-        localStorage.setItem(inventoryKey, JSON.stringify(items));
-    }
+    <div class="profile-section">
+        <div class="profile-label">Student ID / Employee ID:</div>
+        <div class="profile-content">[Your ID Here]</div>
+    </div>
 
-    function renderInventory() {
-        const inventoryList = document.getElementById("inventoryList");
-        inventoryList.innerHTML = "";
+    <div class="profile-section">
+        <div class="profile-label">Program / Role:</div>
+        <div class="profile-content">[Your Program or Position]</div>
+    </div>
 
-        const items = getInventory();
+    <div class="profile-section">
+        <div class="profile-label">Skills:</div>
+        <div class="profile-content">
+            HTML, CSS, JavaScript, Chart.js, LocalStorage
+        </div>
+    </div>
 
-        if (items.length === 0) {
-            inventoryList.innerHTML = '<div class="empty-message">No inventory items added yet.</div>';
-        } else {
-            items.forEach(item => {
-                const itemDiv = document.createElement("div");
-                itemDiv.className = "inventory-item";
-                itemDiv.innerHTML = `
-                    <span><strong>${item.name}</strong> - Qty: ${item.quantity}${item.price ? " | $" + item.price.toFixed(2) : ""}</span>
-                `;
-                inventoryList.appendChild(itemDiv);
-            });
-        }
+    <div class="profile-section">
+        <div class="profile-label">Project Description:</div>
+        <div class="profile-content">
+            This inventory management dashboard was developed as part of a web development project. 
+            It demonstrates dynamic data storage, chart visualization, and multi-page navigation.
+        </div>
+    </div>
 
-        updateChart(items);
-    }
+    <div class="profile-section">
+        <div class="profile-label">Contact:</div>
+        <div class="profile-content">
+            [Your Email Address]
+        </div>
+    </div>
 
-    function validateInput(name, quantity, price) {
-        const items = getInventory();
-
-        if (!name) {
-            alert("Item name cannot be empty.");
-            return false;
-        }
-
-        const duplicate = items.some(item => item.name.toLowerCase() === name.toLowerCase());
-        if (duplicate) {
-            alert("Item name already exists (case-insensitive).");
-            return false;
-        }
-
-        if (!Number.isInteger(quantity) || quantity <= 0) {
-            alert("Quantity must be a positive integer.");
-            return false;
-        }
-
-        if (price !== "" && !/^\d+(\.\d{1,2})?$/.test(price)) {
-            alert("Price must be a positive number with up to two decimal places.");
-            return false;
-        }
-
-        return true;
-    }
-
-    function addItem() {
-        const name = document.getElementById("itemName").value.trim();
-        const quantityValue = document.getElementById("quantity").value;
-        const priceValue = document.getElementById("price").value.trim();
-
-        const quantity = Number(quantityValue);
-
-        if (!validateInput(name, quantity, priceValue)) {
-            return;
-        }
-
-        const items = getInventory();
-        items.push({
-            name,
-            quantity,
-            price: priceValue ? parseFloat(priceValue) : null
-        });
-
-        saveInventory(items);
-        renderInventory();
-
-        document.getElementById("itemName").value = "";
-        document.getElementById("quantity").value = "";
-        document.getElementById("price").value = "";
-    }
-
-    function clearAllItems() {
-        localStorage.removeItem(inventoryKey);
-        renderInventory();
-    }
-
-    function initChart() {
-        const ctx = document.getElementById("inventoryChart").getContext("2d");
-
-        inventoryChart = new Chart(ctx, {
-            type: currentChartType,
-            data: {
-                labels: [],
-                datasets: [{
-                    label: 'Inventory Quantity',
-                    data: [],
-                    backgroundColor: []
-                }]
-            },
-            options: {
-                responsive: true,
-                plugins: {
-                    legend: {
-                        display: currentChartType === 'pie'
-                    }
-                },
-                scales: currentChartType === 'bar' ? {
-                    y: { beginAtZero: true }
-                } : {}
-            }
-        });
-    }
-
-    function updateChart(items) {
-        const labels = items.map(item => item.name);
-        const data = items.map(item => item.quantity);
-
-        inventoryChart.data.labels = labels;
-        inventoryChart.data.datasets[0].data = data;
-        inventoryChart.data.datasets[0].backgroundColor = generateColors(labels.length);
-        inventoryChart.update();
-    }
-
-    function toggleChart() {
-        currentChartType = currentChartType === 'bar' ? 'pie' : 'bar';
-        document.getElementById("toggleChartBtn").innerText =
-            currentChartType === 'bar'
-                ? "Switch to Pie Chart"
-                : "Switch to Bar Chart";
-
-        inventoryChart.destroy();
-        initChart();
-        updateChart(getInventory());
-    }
-
-    function generateColors(count) {
-        const colors = [];
-        for (let i = 0; i < count; i++) {
-            colors.push(`hsl(${i * 50 % 360}, 70%, 60%)`);
-        }
-        return colors;
-    }
-
-    window.onload = function () {
-        initChart();
-        renderInventory();
-    };
-</script>
+    <div class="footer">
+        © 2026 ABC Logistics Inventory Management
+    </div>
+</div>
 
 </body>
 </html>
